@@ -4,15 +4,26 @@ import api from '../../services/api';
 
 export default function EmployeeList() {
   const [employees, setEmployees] = useState([]);
+  const [departments, setDepartments] = useState([]);
 
   useEffect(() => {
     fetchEmployees();
+    fetchDepartments();
   }, []);
 
   const fetchEmployees = async () => {
     try {
       const response = await api.get('/employee');
       setEmployees(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await api.get('/department');
+      setDepartments(response.data);
     } catch (error) {
       console.error(error);
     }
@@ -28,6 +39,11 @@ export default function EmployeeList() {
     }
   };
 
+  const getDepartmentName = (departmentId) => {
+    const department = departments.find(dept => dept.departmentId === departmentId);
+    return department ? department.departmentName : 'Department is not found';
+  };
+
   return (
     <div>
       <h2>Employees</h2>
@@ -41,7 +57,7 @@ export default function EmployeeList() {
             <th>DOB</th>
             <th>Age</th>
             <th>Salary</th>
-            <th>Department ID</th>
+            <th>Department</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -54,7 +70,7 @@ export default function EmployeeList() {
               <td>{new Date(emp.dateOfBirth).toLocaleDateString()}</td>
               <td>{emp.age}</td>
               <td>{emp.salary}</td>
-              <td>{emp.departmentId}</td>
+              <td>{getDepartmentName(emp.departmentId)}</td>
               <td>
                 <Link to={`/employees/edit/${emp.employeeId}`}><button>Edit</button></Link>
                 <button onClick={() => deleteEmployee(emp.employeeId)}>Delete</button>
